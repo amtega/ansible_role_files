@@ -33,6 +33,6 @@
       unsafe_writes: "{{ item.unsafe_writes | default(omit) }}"
     loop: "{{ files }}"
     loop_control:
-      label: "{{ item.path }} {{ item.state }}"
+      label: "{{ item.path }}"
     tags:
       - role::files
