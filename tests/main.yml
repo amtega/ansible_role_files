@@ -1,2 +1,43 @@
 ---
 # Tasks for testing role
+
+- name: run idempotence test
+  hosts: localhost
+  roles:
+    - role: amtega.docker_presets
+      docker_presets_images_json_query: >-
+        [? starts_with(name, `centos-6`)
+           || starts_with(name, `centos-7`)
+           || starts_with(name, `fedora-27`)
+           || starts_with(name, `fedora-28`) ]
+
+    - role: amtega.docker_sandbox
+      docker_sandbox_state: started
+  tags:
+    - sandbox
+
+- name: test files role
+  hosts: docker_sandbox_containers
+  roles:
+    - amtega.files
+  vars:
+    files:
+      - path: /tmp/testdir1
+        state: directory
+      - path: /tmp/testdir2
+        state: directory
+  tasks:
+    - name: search directories
+      stat:
+        path: "{{ item }}"
+      loop: "{{ files | map(attribute='path') | list }}"
+      register: check_dirs_result
+
+    - name: check directories are correct
+      assert:
+        that:
+          - item.stat.exists
+          - item.stat.isdir
+      loop: "{{ check_dirs_result.results }}"
+  tags:
+    - idempotence
