@@ -4,11 +4,14 @@
 # List of dicts with files to configure. The dicts have the same attributes
 # that the ones expected by the ansible file module. For example:
 #
-# gnu_linux_files:
+# files:
 #   - path: /mnt/tmp
 #     user: root
 #     group: root
 #     mode: "0755"
 
-
 files: []
+
+# Prefix to apply to all file paths
+
+#files_prefix:

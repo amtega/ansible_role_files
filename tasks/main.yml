@@ -22,7 +22,10 @@
     group: "{{ item.group | default(omit) }}"
     mode: "{{ item.mode | default(omit) }}"
     owner: "{{ item.owner | default(omit) }}"
-    path: "{{ item.path | default(omit) }}"
+    path: >-
+      {{ (files_prefix | default("") | length > 0)
+         | ternary(files_prefix | default("") + "/", "")
+         + item.path | default(omit) }}
     recurse: "{{ item.recurse | default(omit) }}"
     selevel: "{{ item.selevel | default(omit) }}"
     serole: "{{ item.serole | default(omit) }}"
