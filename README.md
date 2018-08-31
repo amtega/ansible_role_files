@@ -27,8 +27,9 @@ This is an example playbook:
 
   vars:
     files:
-      - path: /mnt/tmp
+      - path: /tmp
         state: directory
+    files_prefix: /mnt
 ```
 
 ## Testing
