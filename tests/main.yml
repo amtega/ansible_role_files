@@ -22,41 +22,15 @@
     - amtega.files
   vars:
     files:
-      - path: /tmp/testdir1
-        state: directory
-      - path: /tmp/testdir2
-        state: directory
-  tasks:
-    - name: search directories
-      stat:
-        path: "{{ item }}"
-      loop: "{{ files | map(attribute='path') | list }}"
-      register: check_dirs_result
-
-    - name: check directories are correct
-      assert:
-        that:
-          - item.stat.exists
-          - item.stat.isdir
-      loop: "{{ check_dirs_result.results }}"
-  tags:
-    - idempotence
-
-- name: test files role with prefix
-  hosts: docker_sandbox_containers
-  roles:
-    - amtega.files
-  vars:
-    files_prefix: /tmp/prefix
-    files:
       - path: testdir1
-        state: directory
       - path: testdir2
-        state: directory
+    files_prefix: /tmp
+    files_defaults:
+      state: directory
   tasks:
     - name: search directories
       stat:
-        path: "/tmp/prefix/{{ item }}"
+        path: "{{ files_prefix }}/{{ item }}"
       loop: "{{ files | map(attribute='path') | list }}"
       register: check_dirs_result
 
