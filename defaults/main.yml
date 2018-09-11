@@ -15,3 +15,9 @@ files: []
 # Prefix to apply to all file paths
 
 #files_prefix:
+
+# Dicitionary with the defaults options to use if no other ones are specified in
+# the `files` variable. The members of the dict are the same attributes
+# that the ones expected by the ansible file module
+
+files_defaults: {}
