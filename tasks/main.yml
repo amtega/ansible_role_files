@@ -18,7 +18,7 @@
   file:
     attributes: >-
       {{ item.attributes | default(files_defaults.attributes) | default(omit) }}
-    follow: >
+    follow: >-
       {{ item.follow | default(files_defaults.follow) | default(omit) }}
     force: >-
       {{ item.force | default(files_defaults.force) | default(omit) }}
