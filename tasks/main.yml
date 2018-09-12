@@ -16,24 +16,40 @@
 
 - name: setup files
   file:
-    attributes: "{{ item.attributes | default(files_defaults.attributes) | default(omit) }}"
-    follow: "{{ item.follow | default(files_defaults.follow) | default(omit) }}"
-    force: "{{ item.force | default(files_defaults.force) | default(omit) }}"
-    group: "{{ item.group | default(files_defaults.group) | default(omit) }}"
-    mode: "{{ item.mode | default(files_defaults.mode) | default(omit) }}"
-    owner: "{{ item.owner | default(files_defaults.owner) | default(omit) }}"
+    attributes: >-
+      {{ item.attributes | default(files_defaults.attributes) | default(omit) }}
+    follow: >-
+      {{ item.follow | default(files_defaults.follow) | default(omit) }}
+    force: >-
+      {{ item.force | default(files_defaults.force) | default(omit) }}
+    group: >-
+      {{ item.group | default(files_defaults.group) | default(omit) }}
+    mode: >-
+      {{ item.mode | default(files_defaults.mode) | default(omit) }}
+    owner: >-
+      {{ item.owner | default(files_defaults.owner) | default(omit) }}
     path: >-
       {{ (files_prefix | default("") | length > 0)
          | ternary(files_prefix | default("") + "/", "")
          + item.path | default(files_defaults.path) | default(omit) }}
-    recurse: "{{ item.recurse | default(files_defaults.recurse) | default(omit) }}"
-    selevel: "{{ item.selevel | default(files_defaults.selevel) | default(omit) }}"
-    serole: "{{ item.serole | default(files_defaults.serole) | default(omit) }}"
-    setype: "{{ item.setype | default(files_defaults.setype) | default(omit) }}"
-    seuser: "{{ item.seuser | default(files_defaults.seuser) | default(omit) }}"
-    src: "{{ item.src | default(files_defaults.src) | default(omit) }}"
-    state: "{{ item.state | default(files_defaults.state) | default(omit) }}"
-    unsafe_writes: "{{ item.unsafe_writes | default(files_defaults.unsafe_writes) | default(omit) }}"
+    recurse: >-
+      {{ item.recurse | default(files_defaults.recurse) | default(omit) }}
+    selevel: >-
+      {{ item.selevel | default(files_defaults.selevel) | default(omit) }}
+    serole: >-
+      {{ item.serole | default(files_defaults.serole) | default(omit) }}
+    setype: >-
+      {{ item.setype | default(files_defaults.setype) | default(omit) }}
+    seuser: >-
+      {{ item.seuser | default(files_defaults.seuser) | default(omit) }}
+    src: >-
+      {{ item.src | default(files_defaults.src) | default(omit) }}
+    state: >-
+      {{ item.state | default(files_defaults.state) | default(omit) }}
+    unsafe_writes: >-
+      {{ item.unsafe_writes
+         | default(files_defaults.unsafe_writes)
+         | default(omit) }}
   loop: "{{ files }}"
   loop_control:
     label: "{{ item.path }}"
