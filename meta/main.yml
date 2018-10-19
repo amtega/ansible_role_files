@@ -2,6 +2,7 @@
 # Role dependencies
 
 galaxy_info:
+  role_name: files
   author: Juan Antonio Valiño García
   description: Manage files through the file module
   company: AMTEGA - Xunta de Galicia
