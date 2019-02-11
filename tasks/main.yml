@@ -1,44 +1,92 @@
 ---
 # Role tasks
 
-- name: setup files
-  file:
-    attributes: >-
-      {{ item.attributes | default(files_defaults.attributes) | default(omit) }}
-    follow: >-
-      {{ item.follow | default(files_defaults.follow) | default(omit) }}
-    force: >-
-      {{ item.force | default(files_defaults.force) | default(omit) }}
-    group: >-
-      {{ item.group | default(files_defaults.group) | default(omit) }}
-    mode: >-
-      {{ item.mode | default(files_defaults.mode) | default(omit) }}
-    owner: >-
-      {{ item.owner | default(files_defaults.owner) | default(omit) }}
-    path: >-
-      {{ (files_prefix | default("") | length > 0)
-         | ternary(files_prefix | default("") + "/", "")
-         + item.path | default(files_defaults.path) | default(omit) }}
-    recurse: >-
-      {{ item.recurse | default(files_defaults.recurse) | default(omit) }}
-    selevel: >-
-      {{ item.selevel | default(files_defaults.selevel) | default(omit) }}
-    serole: >-
-      {{ item.serole | default(files_defaults.serole) | default(omit) }}
-    setype: >-
-      {{ item.setype | default(files_defaults.setype) | default(omit) }}
-    seuser: >-
-      {{ item.seuser | default(files_defaults.seuser) | default(omit) }}
-    src: >-
-      {{ item.src | default(files_defaults.src) | default(omit) }}
-    state: >-
-      {{ item.state | default(files_defaults.state) | default(omit) }}
-    unsafe_writes: >-
-      {{ item.unsafe_writes
-         | default(files_defaults.unsafe_writes)
-         | default(omit) }}
-  loop: "{{ files }}"
-  loop_control:
-    label: "{{ item.path }}"
+- block:
+    - name: setup fact with files loaded from host variables
+      include_role:
+        name: amtega.select_hostvars
+        apply:
+          tags:
+            - role::files
+      vars:
+        select_hostvars_pattern: "^files_.*"
+        select_hostvars_exclude_pattern: "^files_defaults$"
+        select_hostvars_attributes:
+          - path
+        select_hostvars_fact_name: files_hostvars
+        select_hostvars_output_type: list
+      when: files_load_from_hostvars
+
+    - name: setup files
+      file:
+        attributes: >-
+          {{ files_file_item.attributes
+             | default(files_defaults.attributes)
+             | default(omit) }}
+        follow: >-
+          {{ files_file_item.follow
+             | default(files_defaults.follow)
+             | default(omit) }}
+        force: >-
+          {{ files_file_item.force
+             | default(files_defaults.force)
+             | default(omit) }}
+        group: >-
+          {{ files_file_item.group
+             | default(files_defaults.group)
+             | default(omit) }}
+        mode: >-
+          {{ files_file_item.mode
+             | default(files_defaults.mode)
+             | default(omit) }}
+        owner: >-
+          {{ files_file_item.owner
+             | default(files_defaults.owner)
+             | default(omit) }}
+        path: >-
+          {{ (files_prefix | default("") | length > 0)
+             | ternary(files_prefix | default("") + "/", "")
+             + files_file_item.path | default(files_defaults.path) | default(omit) }}
+        recurse: >-
+          {{ files_file_item.recurse
+             | default(files_defaults.recurse)
+             | default(omit) }}
+        selevel: >-
+          {{ files_file_item.selevel
+             | default(files_defaults.selevel)
+             | default(omit) }}
+        serole: >-
+          {{ files_file_item.serole
+             | default(files_defaults.serole)
+             | default(omit) }}
+        setype: >-
+          {{ files_file_item.setype
+             | default(files_defaults.setype)
+             | default(omit) }}
+        seuser: >-
+          {{ files_file_item.seuser
+             | default(files_defaults.seuser)
+             | default(omit) }}
+        src: >-
+          {{ files_file_item.src
+             | default(files_defaults.src)
+             | default(omit) }}
+        state: >-
+          {{ files_file_item.state
+             | default(files_defaults.state)
+             | default(omit) }}
+        unsafe_writes: >-
+          {{ files_file_item.unsafe_writes
+             | default(files_defaults.unsafe_writes)
+             | default(omit) }}
+      loop: "{{ files_to_manage }}"
+      loop_control:
+        loop_var: files_file_item
+        label: "{{ files_file_item.path }}"
+  vars:
+    files_to_manage: >-
+      {{ files
+         + ((files_load_from_hostvars)
+            | ternary(files_hostvars | default([]) | flatten, [])) }}
   tags:
     - role::files

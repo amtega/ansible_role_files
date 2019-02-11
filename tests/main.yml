@@ -16,6 +16,17 @@
   tags:
     - sandbox
 
+- name: prepare docker containers for test
+  hosts: docker_sandbox_containers
+  tasks:
+    - name: setup extra files
+      set_fact:
+        files_extra:
+          - path: testdir3
+          - path: tesdir4
+  tags:
+    - idempotence
+
 - name: test files role
   hosts: docker_sandbox_containers
   roles:
@@ -27,11 +38,12 @@
     files_prefix: /tmp
     files_defaults:
       state: directory
+    files_load_from_hostvars: yes
   tasks:
     - name: search directories
       stat:
         path: "{{ files_prefix }}/{{ item }}"
-      loop: "{{ files | map(attribute='path') | list }}"
+      loop: "{{ (files + files_extra) | map(attribute='path') | list }}"
       register: check_dirs_result
 
     - name: check directories are correct
