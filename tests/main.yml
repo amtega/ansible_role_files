@@ -1,7 +1,7 @@
 ---
 # Tasks for testing role
 
-- name: run idempotence test
+- name: Run idempotence test
   hosts: localhost
   roles:
     - role: amtega.docker_presets
@@ -16,10 +16,10 @@
   tags:
     - sandbox
 
-- name: prepare docker containers for test
+- name: Prepare docker containers for test
   hosts: docker_sandbox_containers
   tasks:
-    - name: setup extra files
+    - name: Setup extra files
       set_fact:
         files_extra:
           - path: testdir3
@@ -27,7 +27,7 @@
   tags:
     - idempotence
 
-- name: test files role
+- name: Test files role
   hosts: docker_sandbox_containers
   roles:
     - amtega.files
@@ -40,13 +40,13 @@
       state: directory
     files_load_from_hostvars: yes
   tasks:
-    - name: search directories
+    - name: Search directories
       stat:
         path: "{{ files_prefix }}/{{ item }}"
       loop: "{{ (files + files_extra) | map(attribute='path') | list }}"
       register: check_dirs_result
 
-    - name: check directories are correct
+    - name: Check directories are correct
       assert:
         that:
           - item.stat.exists
@@ -55,7 +55,7 @@
   tags:
     - idempotence
 
-- name: cleanup docker docker sandbox
+- name: Cleanup docker docker sandbox
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox

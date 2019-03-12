@@ -23,7 +23,23 @@ galaxy_info:
 
 dependencies:
   - role: amtega.check_platform
-    check_platform_distributions:
-      centos: 6
-      fedora: 27
-      rhel: 6
+    vars:
+      check_platform_distributions:
+        centos: 6
+        fedora: 27
+        rhel: 6
+    tags:
+      - role::files
+
+  - role: amtega.select_hostvars
+    vars:
+      select_hostvars_query:
+        pattern: "^files_.*"
+        exclude_pattern: "^files_defaults$"
+        attributes:
+          - path
+        fact_name: files_hostvars
+        output_type: list
+    when: files_load_from_hostvars
+    tags:
+      - role::files
