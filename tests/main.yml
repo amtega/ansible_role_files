@@ -24,6 +24,9 @@
         files_extra:
           - path: testdir3
           - path: tesdir4
+          - path: testfile
+            state: file
+            content: Hello World
   tags:
     - idempotence
 
@@ -40,18 +43,24 @@
       state: directory
     files_load_from_hostvars: yes
   tasks:
-    - name: Search directories
+    - name: Check files and directories
       stat:
         path: "{{ files_prefix }}/{{ item }}"
       loop: "{{ (files + files_extra) | map(attribute='path') | list }}"
-      register: check_dirs_result
+      register: check_result
+
+    - name: Check file contents
+      shell: cat /tmp/testfile
+      changed_when: no
+      register: check_content
 
     - name: Check directories are correct
       assert:
         that:
           - item.stat.exists
-          - item.stat.isdir
-      loop: "{{ check_dirs_result.results }}"
+          - item.stat.isdir or item.stat.isfile
+          - check_content.stdout == "Hello World"
+      loop: "{{ check_result.results }}"
   tags:
     - idempotence
 

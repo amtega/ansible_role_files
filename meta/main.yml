@@ -17,6 +17,7 @@ galaxy_info:
       versions:
         - 27
         - 28
+        - 29
   galaxy_tags:
     - system
     - files

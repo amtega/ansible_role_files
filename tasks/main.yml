@@ -1,76 +1,95 @@
 ---
 # Role tasks
 
-- name: Setup files
-  file:
-    attributes: >-
-      {{ files_file_item.attributes
-         | default(files_defaults.attributes)
-         | default(omit) }}
-    follow: >-
-      {{ files_file_item.follow
-         | default(files_defaults.follow)
-         | default(omit) }}
-    force: >-
-      {{ files_file_item.force
-         | default(files_defaults.force)
-         | default(omit) }}
-    group: >-
-      {{ files_file_item.group
-         | default(files_defaults.group)
-         | default(omit) }}
-    mode: >-
-      {{ files_file_item.mode
-         | default(files_defaults.mode)
-         | default(omit) }}
-    owner: >-
-      {{ files_file_item.owner
-         | default(files_defaults.owner)
-         | default(omit) }}
-    path: >-
-      {{ (files_prefix | default("") | length > 0)
-         | ternary(files_prefix | default("") + "/", "")
-         + files_file_item.path | default(files_defaults.path) | default(omit) }}
-    recurse: >-
-      {{ files_file_item.recurse
-         | default(files_defaults.recurse)
-         | default(omit) }}
-    selevel: >-
-      {{ files_file_item.selevel
-         | default(files_defaults.selevel)
-         | default(omit) }}
-    serole: >-
-      {{ files_file_item.serole
-         | default(files_defaults.serole)
-         | default(omit) }}
-    setype: >-
-      {{ files_file_item.setype
-         | default(files_defaults.setype)
-         | default(omit) }}
-    seuser: >-
-      {{ files_file_item.seuser
-         | default(files_defaults.seuser)
-         | default(omit) }}
-    src: >-
-      {{ files_file_item.src
-         | default(files_defaults.src)
-         | default(omit) }}
-    state: >-
-      {{ files_file_item.state
-         | default(files_defaults.state)
-         | default(omit) }}
-    unsafe_writes: >-
-      {{ files_file_item.unsafe_writes
-         | default(files_defaults.unsafe_writes)
-         | default(omit) }}
-  loop: "{{ files_to_manage }}"
-  loop_control:
-    loop_var: files_file_item
-    label: "{{ files_file_item.path }}"
+- block:
+    - name: Setup files
+      file:
+        attributes: >-
+          {{ files_file_item.attributes
+             | default(files_defaults.attributes)
+             | default(omit) }}
+        follow: >-
+          {{ files_file_item.follow
+             | default(files_defaults.follow)
+             | default(omit) }}
+        force: >-
+          {{ files_file_item.force
+             | default(files_defaults.force)
+             | default(omit) }}
+        group: >-
+          {{ files_file_item.group
+             | default(files_defaults.group)
+             | default(omit) }}
+        mode: >-
+          {{ files_file_item.mode
+             | default(files_defaults.mode)
+             | default(omit) }}
+        owner: >-
+          {{ files_file_item.owner
+             | default(files_defaults.owner)
+             | default(omit) }}
+        path: "{{ files_file_path }}"
+        recurse: >-
+          {{ files_file_item.recurse
+             | default(files_defaults.recurse)
+             | default(omit) }}
+        selevel: >-
+          {{ files_file_item.selevel
+             | default(files_defaults.selevel)
+             | default(omit) }}
+        serole: >-
+          {{ files_file_item.serole
+             | default(files_defaults.serole)
+             | default(omit) }}
+        setype: >-
+          {{ files_file_item.setype
+             | default(files_defaults.setype)
+             | default(omit) }}
+        seuser: >-
+          {{ files_file_item.seuser
+             | default(files_defaults.seuser)
+             | default(omit) }}
+        src: >-
+          {{ files_file_item.src
+             | default(files_defaults.src)
+             | default(omit) }}
+        state: >-
+          {{ files_file_item.state
+             | default(files_defaults.state)
+             | default(omit) }}
+        unsafe_writes: >-
+          {{ files_file_item.unsafe_writes
+             | default(files_defaults.unsafe_writes)
+             | default(omit) }}
+      loop: "{{ files_to_manage }}"
+      loop_control:
+        loop_var: files_file_item
+        label: "{{ files_file_item.path }}"
+
+    - name: Fill files content
+      copy:
+        dest: "{{ files_file_path }}"
+        content: >-
+          {{ files_file_item.content
+             | default(files_defaults.content) }}
+      when: >-
+        files_file_item.content
+        | default(files_defaults.content) is defined
+      loop: "{{ files_to_manage }}"
+      loop_control:
+        loop_var: files_file_item
+        label: "{{ files_file_item.path }}"
   vars:
     files_to_manage: >-
       {{ files
          + ((files_load_from_hostvars)
             | ternary(files_hostvars | default([]) | flatten, [])) }}
+
+    files_file_path: >-
+      {{ (files_prefix | default("") | length > 0)
+         | ternary(files_prefix | default("") + "/", "")
+         + files_file_item.path
+           | default(files_defaults.path)
+           | default(omit) }}
   tags:
     - role::files
