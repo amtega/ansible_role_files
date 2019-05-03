@@ -9,7 +9,8 @@
         [? starts_with(name, `centos-6`)
            || starts_with(name, `centos-7`)
            || starts_with(name, `fedora-27`)
-           || starts_with(name, `fedora-28`) ]
+           || starts_with(name, `fedora-28`)
+           || starts_with(name, `fedora-29`) ]
 
     - role: amtega.docker_sandbox
       docker_sandbox_state: started
@@ -24,6 +25,9 @@
         files_extra:
           - path: testdir3
           - path: tesdir4
+          - path: testfile
+            state: file
+            content: Hello World
   tags:
     - idempotence
 
@@ -40,18 +44,23 @@
       state: directory
     files_load_from_hostvars: yes
   tasks:
-    - name: Search directories
+    - name: Check files
       stat:
         path: "{{ files_prefix }}/{{ item }}"
       loop: "{{ (files + files_extra) | map(attribute='path') | list }}"
-      register: check_dirs_result
+      register: check_result
 
-    - name: Check directories are correct
+    - name: Check file contents
+      shell: cat /tmp/testfile
+      changed_when: no
+      register: check_content
+
+    - name: Check files are correct
       assert:
         that:
           - item.stat.exists
-          - item.stat.isdir
-      loop: "{{ check_dirs_result.results }}"
+          - check_content.stdout == "Hello World"
+      loop: "{{ check_result.results }}"
   tags:
     - idempotence
 
