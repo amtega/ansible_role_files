@@ -2,6 +2,15 @@
 # Role tasks
 
 - block:
+    - name: Check files
+      stat:
+        path: "{{ files_file_path }}"
+      register: files_check_result
+      loop: "{{ files_to_manage }}"
+      loop_control:
+        loop_var: files_file_item
+        label: "{{ files_file_item.path }}"
+
     - name: Setup files
       file:
         attributes: >-
@@ -53,10 +62,7 @@
           {{ files_file_item.src
              | default(files_defaults.src)
              | default(omit) }}
-        state: >-
-          {{ files_file_item.state
-             | default(files_defaults.state)
-             | default(omit) }}
+        state: "{{ files_file_state }}"
         unsafe_writes: >-
           {{ files_file_item.unsafe_writes
              | default(files_defaults.unsafe_writes)
@@ -64,7 +70,16 @@
       loop: "{{ files_to_manage }}"
       loop_control:
         loop_var: files_file_item
+        index_var: files_file_index
         label: "{{ files_file_item.path }}"
+      vars:
+        files_file_state: >-
+          {{ (not files_check_result.results[files_file_index].stat.exists
+              and files_file_item.state
+                  | default(files_defaults.state) == "file")
+             | ternary("touch",
+                       files_file_item.state
+                       | default(files_defaults.state)) }}
 
     - name: Fill files content
       copy:
