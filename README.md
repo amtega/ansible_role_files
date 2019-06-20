@@ -16,7 +16,6 @@ This is an example playbook:
 - hosts: all
   roles:
     - amtega.files
-
   vars:
     files:
       - path: /tmp
