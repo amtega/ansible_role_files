@@ -41,6 +41,6 @@ dependencies:
           - path
         fact_name: files_hostvars
         output_type: list
-    when: files_load_from_hostvars
+    when: files_load_from_hostvars | bool
     tags:
       - role::files
