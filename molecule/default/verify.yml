@@ -1,0 +1,23 @@
+---
+
+- name: Verify
+  hosts: molecule_hosts
+  gather_facts: no
+  tasks:
+    - name: Check files
+      stat:
+        path: "{{ files_prefix }}/{{ item }}"
+      loop: "{{ (files + files_extra) | map(attribute='path') | list }}"
+      register: check_result
+
+    - name: Check file contents
+      shell: cat /tmp/testfile
+      changed_when: no
+      register: check_content
+
+    - name: Check files are correct
+      assert:
+        that:
+          - item.stat.exists
+          - check_content.stdout == "Hello World"
+      loop: "{{ check_result.results }}"

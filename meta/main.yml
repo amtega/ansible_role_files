@@ -13,6 +13,7 @@ galaxy_info:
       versions:
         - 6
         - 7
+        - 8
     - name: Fedora
       versions:
         - 29
@@ -27,9 +28,7 @@ dependencies:
       check_platform_distributions:
         centos: 6
         fedora: 29
-        rhel: 6
-    tags:
-      - role::files
+        redhat: 6
 
   - role: amtega.select_hostvars
     vars:
@@ -41,5 +40,3 @@ dependencies:
         fact_name: files_hostvars
         output_type: list
     when: files_load_from_hostvars | bool
-    tags:
-      - role::files
