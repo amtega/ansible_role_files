@@ -81,7 +81,7 @@
                        files_file_item.state
                        | default(files_defaults.state)) }}
 
-    - name: Fill files content
+    - name: Fill files content # noqa risky-file-permissions
       copy:
         dest: "{{ files_file_path }}"
         content: >-
