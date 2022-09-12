@@ -1,9 +1,9 @@
 ---
-# Role tasks
 
-- block:
+- name: Setup files
+  block:
     - name: Check files
-      stat:
+      ansible.builtin.stat:
         path: "{{ files_file_path }}"
       register: files_check_result
       loop: "{{ files_to_manage }}"
@@ -12,7 +12,7 @@
         label: "{{ files_file_item.path }}"
 
     - name: Setup files
-      file:
+      ansible.builtin.file:
         attributes: >-
           {{ files_file_item.attributes
              | default(files_defaults.attributes)
@@ -82,7 +82,7 @@
                        | default(files_defaults.state)) }}
 
     - name: Fill files content # noqa risky-file-permissions
-      copy:
+      ansible.builtin.copy:
         dest: "{{ files_file_path }}"
         content: >-
           {{ files_file_item.content
