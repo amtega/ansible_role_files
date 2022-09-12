@@ -5,18 +5,18 @@
   gather_facts: no
   tasks:
     - name: Check files
-      stat:
+      ansible.builtin.stat:
         path: "{{ files_prefix }}/{{ item }}"
       loop: "{{ (files + files_extra) | map(attribute='path') | list }}"
       register: check_result
 
     - name: Check file contents
-      command: cat /tmp/testfile
+      ansible.builtin.command: cat /tmp/testfile
       changed_when: no
       register: check_content
 
     - name: Check files are correct
-      assert:
+      ansible.builtin.assert:
         that:
           - item.stat.exists
           - check_content.stdout == "Hello World"
